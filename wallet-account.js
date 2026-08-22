@@ -4,7 +4,7 @@
  * N\u1ea1p SAU app.js.
  */
 const WALLET_QR_API_URL=
-  'https://surfing-harry-assumed-reviewed.trycloudflare.com/run-bot';
+  'https://nextel-utilization-located-demanding.trycloudflare.com/run-bot';
 
 let walletDepositTimer=null;
 let walletQrObjectUrl='';
