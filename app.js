@@ -1773,7 +1773,7 @@ function renderSelection(){
     updateSummary();
     }
   );
-
+}
 function fastPick(type){
   if(type==='clear'){
     state.numbers=[];
