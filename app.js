@@ -608,8 +608,14 @@ function unitStake(){
 }
 
 function defaultModeForGame(game=state.game){
-  if(game==='lo_xien'){
-    return'quick';
+  if{
+      window.matchMedia('(max-width: 760px)').matches&&modeAllowed('manual',game)
+    ){
+      return'manual';
+    }
+
+    if(game==='lo_xien'){
+      return'quick';
   }
 
   return'digits';
@@ -1654,6 +1660,9 @@ function renderSelection(){
 
         <textarea
           id="manualInput"
+          inputmode="decimal"
+          autocomplete="off"
+          spellcheck="false"
           placeholder="Ví dụ: ${example}"
         ></textarea>
 
@@ -1752,9 +1761,18 @@ function renderSelection(){
 
   el('manualInput')?.addEventListener(
     'input',
-    updateSummary
+    event=>{
+      const textarea=event.currentTarget;
+      const filtered=textarea.value.replace(
+        /[^0-9,]/g,
+        ''
+        );
+      if(textarea.value!==filtered){
+        textarea.value=filtered;
+      }
+    updateSummary();
+    }
   );
-}
 
 function fastPick(type){
   if(type==='clear'){
