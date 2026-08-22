@@ -1,0 +1,602 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <title>Wellcome</title>
+  <script src="https://www.minhngoc.net.vn/jquery/jquery-1.7.2.js"></script>
+  <link rel="stylesheet" href="https://www.minhngoc.net.vn/style/bangketqua_mini.css">
+  <link rel="stylesheet" href="styles.css">
+  <!-- Footer tách riêng để không làm file styles.css hiện tại nặng thêm -->
+  <link rel="stylesheet" href="footer.css">
+  <link rel="stylesheet" href="menu-banners.css">
+</head>
+<body>
+<div id="toast" class="toast"></div>
+
+<!-- Desktop header: structure follows the reference, branding remains  -->
+<header class="desktop-header">
+  <div class="topline">
+    <div class="head-wrap">
+      <div id="desktopClock" class="top-clock">Ngày -- Tháng -- Năm --:-- 🇻🇳</div>
+      <div class="top-links">
+        <span>🏆 Nhãn hiệu</span><b>Giới Thiệu</b><i></i>
+        <span>♛ Tài trợ</span><i></i>
+        <span>🤝 Hợp tác</span><b>Đại Lý</b><i></i>
+        <span>🎧 Cskh</span><b>Hỗ trợ 24/7</b>
+      </div>
+    </div>
+  </div>
+  <div class="loginline">
+    <div class="head-wrap login-wrap">
+      <a class="demo-logo logo-image-link" href="#" aria-label="Trang chủ">
+        <!-- THAY LINK ẢNH GITHUB CỦA BẠN Ở src BÊN DƯỚI -->
+        <img
+          src="./logo-234.png"
+          alt="234"
+          class="site-logo-image"
+        >
+      </a>
+      <div id="desktopAuth" class="desktop-auth">
+        <input id="headerUser" autocomplete="username" placeholder="Tên đăng nhập">
+        <input id="headerPass" autocomplete="current-password" type="password" placeholder="mật khẩu">
+        <span class="captcha-demo">3666</span>
+        <input class="captcha-field" placeholder="Mã xác nhận">
+        <button id="headerLogin" class="btn-login">đăng nhập</button>
+        <button id="headerRegister" class="btn-register">đăng ký</button>
+        <button id="headerTry" class="btn-try">Chơi thử</button>
+        <button id="headerForgot" class="btn-forgot">Quên mật khẩu?</button>
+      </div>
+    </div>
+  </div>
+  <div class="main-nav-line">
+    <div class="nav-banner nav-banner--left" aria-hidden="true">
+      <img
+        class="nav-banner__image"
+        src="./menu-banner-left.png"
+        alt=""
+        width="321"
+        height="82"
+      >
+    </div>
+    <nav class="main-nav">
+      <a>🏠<span>TRANG CHỦ</span></a><a class="active">🎱<span>XỔ SỐ</span></a>
+      <a>🎰<span>CASINO</span></a><a>⚽<span>THỂ THAO</span></a>
+      <a>♞<span>TRÒ CHƠI</span></a><a>▣<span>GAME SLOT</span></a>
+      <a>◇<span>GAME BÀI</span></a><a>🐟<span>BẮN CÁ</span></a>
+      <a>♘<span>ĐÁ GÀ</span></a><a>🎮<span>ESPORTS</span></a><a>🎁<span>KHÁM PHÁ</span></a>
+    </nav>
+    <div class="nav-banner nav-banner--right right" aria-hidden="true">
+      <img
+        class="nav-banner__image"
+        src="./menu-banner-right.png"
+        alt=""
+        width="305"
+        height="80"
+      >
+    </div>
+  </div>
+  <div class="sub-nav-line">
+    <div class="sub-nav">
+      <span>◉ Quảng cáo</span><span>Thương hiệu 234B</span><i></i>
+      <span>▣ Giải trí</span><span>Gái xinh sexy</span><i></i>
+      <span>🌐 Trang mạng</span><span>Link Dự Phòng</span><i></i>
+      <span>🏅 Độc quyền</span><span>Xổ số trực tiếp</span>
+      <b>⟳ Trực Tuyến</b>
+      <em>3</em><em>5</em><em>6</em><em>5</em><em>8</em><em>5</em>
+    </div>
+  </div>
+</header>
+
+<!-- Mobile header -->
+<header class="mobile-header">
+  <button id="mobileBack" class="m-head-btn">‹</button>
+  <button id="mobileRegion" class="m-region">Miền Bắc <span>⌄</span></button>
+  <button id="mobileMenu" class="m-head-btn menu">☷</button>
+</header>
+
+<div id="drawerBackdrop" class="drawer-backdrop"></div>
+<aside id="mobileDrawer" class="mobile-drawer">
+  <div class="drawer-account">
+    <div class="drawer-logo drawer-logo-image">
+      <img src="./logo-234.png" alt="234">
+    </div>
+    <div id="drawerBalance" class="drawer-balance">0 VND</div>
+    <div id="drawerAuth" class="drawer-auth">
+      <button id="drawerLogin">Đăng nhập</button><button id="drawerRegister">Đăng ký</button>
+    </div>
+  </div>
+  <nav class="drawer-menu">
+    <button data-drawer="settled"><span class="orange">↻</span><b>Thắng thua</b><em id="settledCount">0</em></button>
+    <button data-drawer="pending"><span class="blue">🛒</span><b>Chưa thanh toán</b><em id="pendingCountDrawer">0</em></button>
+    <hr>
+    <button data-drawer="closed"><span class="red">▣</span><b>Hôm nay đã đóng</b></button>
+    <button data-drawer="all"><span class="blue">▣</span><b>Hồ sơ cá cược</b></button>
+    <button data-drawer="feed"><span class="yellow">▤</span><b>Lịch sử nuôi</b></button>
+    <button data-drawer="results"><span class="pink">✿</span><b>KQ Mở thưởng</b></button>
+    <button data-drawer="help"><span class="purple">ⓘ</span><b>Cách chơi</b></button>
+    <hr>
+    <button data-drawer="theme"><span class="pink">◈</span><b>Thay đổi chủ đề</b></button>
+    <button data-drawer="support"><span class="blue">◉</span><b>CSKH</b></button>
+    <button data-drawer="home"><span class="yellow">⌂</span><b>Trang chủ</b></button>
+  </nav>
+</aside>
+
+<main class="page-wrap">
+  <section class="lottery-shell">
+    <div class="game-column">
+      <!-- mobile-only game heading -->
+      <section class="mobile-game-head">
+        <div class="m-game-row">
+          <button id="mobileGamePicker" class="m-game-picker"><span id="mobileGameName">Lô 2 Số</span> <b>▾</b></button>
+          <div id="mobileBalls" class="m-balls"><span>1</span><span>2</span><span>2</span><span class="orange">2</span><span class="orange">1</span></div>
+        </div>
+        <div class="m-draw-row">
+          <div>Lượt xổ <b id="mobileDrawDate">--/--/----</b></div>
+          <div id="mobileCountdown" class="m-countdown"></div>
+        </div>
+      </section>
+      <div id="mobileGameMenu" class="mobile-game-menu"></div>
+
+      <!-- desktop game heading -->
+      <section class="draw-banner">
+        <div class="game-brand">
+          <div class="game-icon">🎱</div>
+          <div><h3>Miền Bắc</h3><p id="desktopGameName">Lô 2 Số</p><button class="hall-btn">Sảnh trò chơi</button></div>
+        </div>
+        <div class="last-result">
+          <div id="heroBalls" class="hero-balls"><span>0</span><span>4</span><span>9</span><span class="orange">2</span><span class="orange">2</span></div>
+          <p>KQ Mở thưởng <span id="resultDate">--/--/----</span></p>
+        </div>
+        <div class="draw-countdown">
+          <p id="deadlineText">Kỳ tiếp theo --/--/----</p>
+          <div id="countdown" class="countdown"></div>
+        </div>
+      </section>
+
+      <nav id="gameTabs" class="game-tabs">
+        <button data-game="bao_lo" class="active">Bao Lô</button><button data-game="lo_xien">Lô Xiên</button>
+        <button data-game="danh_de">Đánh Đề</button><button data-game="dau_duoi">Đầu Đuôi</button>
+        <button data-game="ba_cang">3 Càng</button><button data-game="bon_cang">4 Càng</button>
+        <button id="playHelpBtn" class="game-help-btn" type="button">ⓘ Cách chơi</button>
+      </nav>
+
+      <div class="sub-mode-row">
+        <div id="subTabs" class="sub-tabs"></div>
+        <div id="modeHint" class="mode-hint"></div>
+        <div id="modeTabs" class="mode-tabs">
+          <button data-mode="digits" class="active">Chọn số</button>
+          <button data-mode="manual">Con số</button>
+          <button data-mode="quick">Chọn số nhanh</button>
+        </div>
+      </div>
+
+      <section id="selectionArea" class="selection-area"></section>
+
+      <div class="bet-toolbar">
+        <div class="odds-box">Tỉ lệ cược : <b id="oddsText">1 : 99.9</b></div>
+        <div>Đã chọn: <b id="selectedCount">0</b> mục</div>
+        <div>Số tiền : <b id="selectedMoney">0</b> VND</div>
+        <div class="multiplier"><span>Số nhân :</span><button id="minus">−</button><input id="multiplier" type="number" min="1" value="1"><button id="plus">＋</button></div>
+        <button id="instantBet" class="blue-btn">Cược ngay</button>
+        <button id="addDraft" class="orange-btn">Thêm số</button>
+        <button id="resetSelection" class="gray-btn">Cài lại</button>
+      </div>
+
+      <section class="draft-panel">
+        <div class="draft-title">Nội dung cược</div>
+        <div class="table-scroll"><table class="draft-table"><thead><tr>
+          <th>Cách chơi</th><th>Nội dung cược</th><th>Tổng đơn cược</th><th>Số nhân</th><th>Tiền cược</th><th>Tiền thắng /1 lần</th><th>Vận hành</th>
+        </tr></thead><tbody id="draftBody"></tbody></table></div>
+        <div id="draftEmpty" class="empty-message">Không có dữ liệu</div>
+      </section>
+      <div class="checkout-row"><div>Tổng cộng : <b id="draftTotal">0</b> VND</div><div><button id="clearDrafts" class="orange-btn wide">Xóa hết</button><button id="submitDrafts" class="blue-btn wide">Cá cược</button></div></div>
+    </div>
+
+    <!-- Exact Minh Ngoc embed, trimmed only by our CSS/JS. -->
+    <aside class="result-column">
+      <div class="result-logo">◢ <b>VNLOTTERY</b></div>
+      <div class="result-date"><span id="sideDate">--/--/----</span><span>⌄</span></div>
+      <div class="result-draw-title">Lượt xổ <span id="sideDrawDate">--/--/----</span></div>
+      <div id="resultLoading" class="result-loading">Đang tải KQXS Miền Bắc...</div>
+      <div class="minhngoc-embed">
+        <div id="box_kqxs_minhngoc">
+          <script>bgcolor="#bfbfbf";titlecolor="#730038";dbcolor="#000000";fsize="12px";kqwidth="300px";</script>
+          <script src="https://www.minhngoc.net.vn/getkqxs/mien-bac.js"></script>
+        </div>
+      </div>
+      <div id="dbTags" class="db-tags"></div>
+      <div class="head-tail-head"><span>Đầu</span><span>Đuôi</span></div>
+      <div id="headTail" class="head-tail"></div>
+    </aside>
+  </section>
+
+  <section class="history-shell">
+    <div id="historyTabs" class="history-tabs">
+      <button data-filter="all" class="active">Hồ sơ cá cược</button><button data-filter="settled">Thắng thua</button><button data-filter="pending">Chưa thanh toán</button><button id="refreshHistory">Làm mới</button>
+    </div>
+    <div class="history-scroll"><table class="history-table"><thead><tr>
+      <th>Trò chơi</th><th>Lượt xổ</th><th>Mã đơn</th><th>Thời gian cược</th><th>Cách chơi</th><th>Nội dung cược</th><th>Tổng đơn cược</th><th>Số nhân</th><th>Tổng cộng</th><th>Cược hợp lệ</th><th>Tổng thắng thua</th><th>Vận hành</th>
+    </tr></thead><tbody id="historyBody"></tbody></table></div>
+    <div id="historyEmpty" class="history-empty">Không có thêm dữ liệu</div>
+    <div class="pagination"><button disabled>‹</button><button class="active">1</button><button disabled>›</button></div>
+  </section>
+</main>
+
+<!-- Mobile bottom bar -->
+<div class="mobile-betbar">
+  <div class="chip-row"><div class="chip-list"><button data-chip="1" class="chip c1 active">1x</button><button data-chip="3" class="chip c3">3x</button><button data-chip="5" class="chip c5">5x</button><button data-chip="10" class="chip c10">10x</button></div><input id="mMultiplier" value="1" readonly><div>Đã chọn: <b id="mSelectedCount">0</b> mục</div></div>
+  <div class="mobile-action"><button id="mReset" class="m-reset">Cài lại</button><div class="m-money"><span>Tiền cược: <b id="mMoney">0</b></span><span>Số dư: <b id="mBalance">0</b></span></div><button id="mBet" class="m-bet">Cá cược</button></div>
+</div>
+
+<!-- Mobile pages -->
+<section id="mobileRecords" class="mobile-page"><header><button data-close-mobile-page>‹</button><strong id="mobileRecordsTitle">Hồ sơ cá cược</strong><button id="mobileRecordsRefresh">⟳</button></header><div id="mobileRecordsList" class="mobile-card-list"></div></section>
+<section id="mobileResults" class="mobile-page"><header><button data-close-mobile-page>‹</button><strong>KQ Mở thưởng</strong><button id="mobileResultsRefresh">⟳</button></header><div id="mobileResultsBody" class="mobile-results-body"></div></section>
+
+
+<!-- =========================================================
+     POPUP DÙNG CHUNG
+     ========================================================= -->
+<div id="helpModal" class="help-modal hidden" aria-hidden="true">
+  <div class="help-modal-card" role="dialog" aria-modal="true" aria-labelledby="helpModalTitle">
+    <div class="help-modal-head">
+      <h2 id="helpModalTitle">Hướng dẫn chơi</h2>
+      <button id="helpModalClose" class="help-modal-close" type="button" aria-label="Đóng">×</button>
+    </div>
+    <div id="helpModalBody" class="help-modal-body"></div>
+  </div>
+</div>
+
+<!-- =========================================================
+     NỘI DUNG POPUP - BẠN CÓ THỂ TỰ SỬA NGAY TRONG HTML
+     JS chỉ lấy nội dung các template này để hiển thị.
+     ========================================================= -->
+
+<!-- HƯỚNG DẪN - dùng khi đang ở "Chọn số nhanh" -->
+<template id="helpQuickTemplate">
+  <p>Ngẫu Nhiên: chọn ngẫu nhiên các số đánh.</p>
+  <p>Đặc biệt: gợi ý chọn nhanh các số kép bằng, chẵn, lẻ, lớn, bé.</p>
+  <p>Ít Xuất Hiện: chọn ra các số ít xuất hiện nhất dựa theo kết quả 50 kỳ xổ gần nhất.</p>
+  <p>Số mũ trên mỗi số đánh là thống kê số lần không xuất hiện liên tiếp lâu nhất trong 50 kỳ xổ. Trong đó:</p>
+  <p>- Màu xanh là những số đánh có số lần từ 10 trở lên đối với loại đánh đề, 3 càng, 4 càng, đầu đuôi và từ 5 trở lên đối với lô, xiên.</p>
+  <p>- Màu đỏ là những số đánh có số lần xuất hiện từ 1 trở xuống.</p>
+  <p>- Màu xám là những số đánh còn lại.</p>
+</template>
+
+<!-- NÓNG/LẠNH - dùng ở Chọn số của Đánh Đề / 3 Càng / 4 Càng -->
+<template id="helpHotColdTemplate">
+  <p>Thống kê số lần không xuất hiện liên tiếp trong 50 kỳ xổ.</p>
+  <p>Trong đó:</p>
+  <p>- Màu xanh là những số đánh có số lần từ 10 trở lên đối với loại đánh đề, 3 càng, 4 càng, đầu đuôi và từ 5 trở lên đối với lô, xiên.</p>
+  <p>- Màu đỏ là những số đánh có số lần xuất hiện từ 1 trở xuống.</p>
+  <p>- Màu xám là những số đánh còn lại.</p>
+</template>
+
+<!-- CÁCH CHƠI - MỖI TAB CON MỘT TEMPLATE RIÊNG -->
+
+  <template data-help-type="play" data-game="bao_lo" data-sub="lo2">
+    <!-- =====================================================
+         CÁCH CHƠI: Lô 2 Số
+         BẠN TỰ THAY NỘI DUNG TRONG TEMPLATE NÀY
+         ===================================================== -->
+    <p><b>Lô 2 Số</b></p>
+    <p>Nhập nội dung hướng dẫn cách chơi của tab <b>Lô 2 Số</b> tại đây.</p>
+    <p>Bạn có thể thêm nhiều dòng <code>&lt;p&gt;...&lt;/p&gt;</code> tùy ý.</p>
+  </template>
+  <template data-help-type="play" data-game="bao_lo" data-sub="lo2dau">
+    <!-- =====================================================
+         CÁCH CHƠI: Lô 2 Số Đầu
+         BẠN TỰ THAY NỘI DUNG TRONG TEMPLATE NÀY
+         ===================================================== -->
+    <p><b>Lô 2 Số Đầu</b></p>
+    <p>Nhập nội dung hướng dẫn cách chơi của tab <b>Lô 2 Số Đầu</b> tại đây.</p>
+    <p>Bạn có thể thêm nhiều dòng <code>&lt;p&gt;...&lt;/p&gt;</code> tùy ý.</p>
+  </template>
+  <template data-help-type="play" data-game="bao_lo" data-sub="lo2_1k">
+    <!-- =====================================================
+         CÁCH CHƠI: Lô 2 Số 1K
+         BẠN TỰ THAY NỘI DUNG TRONG TEMPLATE NÀY
+         ===================================================== -->
+    <p><b>Lô 2 Số 1K</b></p>
+    <p>Nhập nội dung hướng dẫn cách chơi của tab <b>Lô 2 Số 1K</b> tại đây.</p>
+    <p>Bạn có thể thêm nhiều dòng <code>&lt;p&gt;...&lt;/p&gt;</code> tùy ý.</p>
+  </template>
+  <template data-help-type="play" data-game="bao_lo" data-sub="lo3">
+    <!-- =====================================================
+         CÁCH CHƠI: Lô 3 Số
+         BẠN TỰ THAY NỘI DUNG TRONG TEMPLATE NÀY
+         ===================================================== -->
+    <p><b>Lô 3 Số</b></p>
+    <p>Nhập nội dung hướng dẫn cách chơi của tab <b>Lô 3 Số</b> tại đây.</p>
+    <p>Bạn có thể thêm nhiều dòng <code>&lt;p&gt;...&lt;/p&gt;</code> tùy ý.</p>
+  </template>
+  <template data-help-type="play" data-game="bao_lo" data-sub="lo4">
+    <!-- =====================================================
+         CÁCH CHƠI: Lô 4 Số
+         BẠN TỰ THAY NỘI DUNG TRONG TEMPLATE NÀY
+         ===================================================== -->
+    <p><b>Lô 4 Số</b></p>
+    <p>Nhập nội dung hướng dẫn cách chơi của tab <b>Lô 4 Số</b> tại đây.</p>
+    <p>Bạn có thể thêm nhiều dòng <code>&lt;p&gt;...&lt;/p&gt;</code> tùy ý.</p>
+  </template>
+  <template data-help-type="play" data-game="lo_xien" data-sub="xien2">
+    <!-- =====================================================
+         CÁCH CHƠI: Xiên 2
+         BẠN TỰ THAY NỘI DUNG TRONG TEMPLATE NÀY
+         ===================================================== -->
+    <p><b>Xiên 2</b></p>
+    <p>Nhập nội dung hướng dẫn cách chơi của tab <b>Xiên 2</b> tại đây.</p>
+    <p>Bạn có thể thêm nhiều dòng <code>&lt;p&gt;...&lt;/p&gt;</code> tùy ý.</p>
+  </template>
+  <template data-help-type="play" data-game="lo_xien" data-sub="xien3">
+    <!-- =====================================================
+         CÁCH CHƠI: Xiên 3
+         BẠN TỰ THAY NỘI DUNG TRONG TEMPLATE NÀY
+         ===================================================== -->
+    <p><b>Xiên 3</b></p>
+    <p>Nhập nội dung hướng dẫn cách chơi của tab <b>Xiên 3</b> tại đây.</p>
+    <p>Bạn có thể thêm nhiều dòng <code>&lt;p&gt;...&lt;/p&gt;</code> tùy ý.</p>
+  </template>
+  <template data-help-type="play" data-game="lo_xien" data-sub="xien4">
+    <!-- =====================================================
+         CÁCH CHƠI: Xiên 4
+         BẠN TỰ THAY NỘI DUNG TRONG TEMPLATE NÀY
+         ===================================================== -->
+    <p><b>Xiên 4</b></p>
+    <p>Nhập nội dung hướng dẫn cách chơi của tab <b>Xiên 4</b> tại đây.</p>
+    <p>Bạn có thể thêm nhiều dòng <code>&lt;p&gt;...&lt;/p&gt;</code> tùy ý.</p>
+  </template>
+  <template data-help-type="play" data-game="danh_de" data-sub="de_db">
+    <!-- =====================================================
+         CÁCH CHƠI: Đề đặc biệt
+         BẠN TỰ THAY NỘI DUNG TRONG TEMPLATE NÀY
+         ===================================================== -->
+    <p><b>Đề đặc biệt</b></p>
+    <p>Nhập nội dung hướng dẫn cách chơi của tab <b>Đề đặc biệt</b> tại đây.</p>
+    <p>Bạn có thể thêm nhiều dòng <code>&lt;p&gt;...&lt;/p&gt;</code> tùy ý.</p>
+  </template>
+  <template data-help-type="play" data-game="danh_de" data-sub="de_dau_db">
+    <!-- =====================================================
+         CÁCH CHƠI: Đề đầu đặc biệt
+         BẠN TỰ THAY NỘI DUNG TRONG TEMPLATE NÀY
+         ===================================================== -->
+    <p><b>Đề đầu đặc biệt</b></p>
+    <p>Nhập nội dung hướng dẫn cách chơi của tab <b>Đề đầu đặc biệt</b> tại đây.</p>
+    <p>Bạn có thể thêm nhiều dòng <code>&lt;p&gt;...&lt;/p&gt;</code> tùy ý.</p>
+  </template>
+  <template data-help-type="play" data-game="danh_de" data-sub="de_giai7">
+    <!-- =====================================================
+         CÁCH CHƠI: Đề Giải 7
+         BẠN TỰ THAY NỘI DUNG TRONG TEMPLATE NÀY
+         ===================================================== -->
+    <p><b>Đề Giải 7</b></p>
+    <p>Nhập nội dung hướng dẫn cách chơi của tab <b>Đề Giải 7</b> tại đây.</p>
+    <p>Bạn có thể thêm nhiều dòng <code>&lt;p&gt;...&lt;/p&gt;</code> tùy ý.</p>
+  </template>
+  <template data-help-type="play" data-game="danh_de" data-sub="de_giai1">
+    <!-- =====================================================
+         CÁCH CHƠI: Đề Giải Nhất
+         BẠN TỰ THAY NỘI DUNG TRONG TEMPLATE NÀY
+         ===================================================== -->
+    <p><b>Đề Giải Nhất</b></p>
+    <p>Nhập nội dung hướng dẫn cách chơi của tab <b>Đề Giải Nhất</b> tại đây.</p>
+    <p>Bạn có thể thêm nhiều dòng <code>&lt;p&gt;...&lt;/p&gt;</code> tùy ý.</p>
+  </template>
+  <template data-help-type="play" data-game="danh_de" data-sub="de_dau_giai1">
+    <!-- =====================================================
+         CÁCH CHƠI: Đề đầu giải nhất
+         BẠN TỰ THAY NỘI DUNG TRONG TEMPLATE NÀY
+         ===================================================== -->
+    <p><b>Đề đầu giải nhất</b></p>
+    <p>Nhập nội dung hướng dẫn cách chơi của tab <b>Đề đầu giải nhất</b> tại đây.</p>
+    <p>Bạn có thể thêm nhiều dòng <code>&lt;p&gt;...&lt;/p&gt;</code> tùy ý.</p>
+  </template>
+  <template data-help-type="play" data-game="dau_duoi" data-sub="dau">
+    <!-- =====================================================
+         CÁCH CHƠI: Đầu
+         BẠN TỰ THAY NỘI DUNG TRONG TEMPLATE NÀY
+         ===================================================== -->
+    <p><b>Đầu</b></p>
+    <p>Nhập nội dung hướng dẫn cách chơi của tab <b>Đầu</b> tại đây.</p>
+    <p>Bạn có thể thêm nhiều dòng <code>&lt;p&gt;...&lt;/p&gt;</code> tùy ý.</p>
+  </template>
+  <template data-help-type="play" data-game="dau_duoi" data-sub="duoi">
+    <!-- =====================================================
+         CÁCH CHƠI: Đuôi
+         BẠN TỰ THAY NỘI DUNG TRONG TEMPLATE NÀY
+         ===================================================== -->
+    <p><b>Đuôi</b></p>
+    <p>Nhập nội dung hướng dẫn cách chơi của tab <b>Đuôi</b> tại đây.</p>
+    <p>Bạn có thể thêm nhiều dòng <code>&lt;p&gt;...&lt;/p&gt;</code> tùy ý.</p>
+  </template>
+  <template data-help-type="play" data-game="ba_cang" data-sub="3c_db">
+    <!-- =====================================================
+         CÁCH CHƠI: 3 Càng Đặc Biệt
+         BẠN TỰ THAY NỘI DUNG TRONG TEMPLATE NÀY
+         ===================================================== -->
+    <p><b>3 Càng Đặc Biệt</b></p>
+    <p>Nhập nội dung hướng dẫn cách chơi của tab <b>3 Càng Đặc Biệt</b> tại đây.</p>
+    <p>Bạn có thể thêm nhiều dòng <code>&lt;p&gt;...&lt;/p&gt;</code> tùy ý.</p>
+  </template>
+  <template data-help-type="play" data-game="ba_cang" data-sub="3c_giai1">
+    <!-- =====================================================
+         CÁCH CHƠI: 3 Càng Giải Nhất
+         BẠN TỰ THAY NỘI DUNG TRONG TEMPLATE NÀY
+         ===================================================== -->
+    <p><b>3 Càng Giải Nhất</b></p>
+    <p>Nhập nội dung hướng dẫn cách chơi của tab <b>3 Càng Giải Nhất</b> tại đây.</p>
+    <p>Bạn có thể thêm nhiều dòng <code>&lt;p&gt;...&lt;/p&gt;</code> tùy ý.</p>
+  </template>
+  <template data-help-type="play" data-game="ba_cang" data-sub="3c_dau_duoi">
+    <!-- =====================================================
+         CÁCH CHƠI: 3 Càng Đầu Đuôi
+         BẠN TỰ THAY NỘI DUNG TRONG TEMPLATE NÀY
+         ===================================================== -->
+    <p><b>3 Càng Đầu Đuôi</b></p>
+    <p>Nhập nội dung hướng dẫn cách chơi của tab <b>3 Càng Đầu Đuôi</b> tại đây.</p>
+    <p>Bạn có thể thêm nhiều dòng <code>&lt;p&gt;...&lt;/p&gt;</code> tùy ý.</p>
+  </template>
+  <template data-help-type="play" data-game="ba_cang" data-sub="3c_dau">
+    <!-- =====================================================
+         CÁCH CHƠI: 3 Càng Đầu
+         BẠN TỰ THAY NỘI DUNG TRONG TEMPLATE NÀY
+         ===================================================== -->
+    <p><b>3 Càng Đầu</b></p>
+    <p>Nhập nội dung hướng dẫn cách chơi của tab <b>3 Càng Đầu</b> tại đây.</p>
+    <p>Bạn có thể thêm nhiều dòng <code>&lt;p&gt;...&lt;/p&gt;</code> tùy ý.</p>
+  </template>
+  <template data-help-type="play" data-game="bon_cang" data-sub="4cang">
+    <!-- =====================================================
+         CÁCH CHƠI: 4 Càng
+         BẠN TỰ THAY NỘI DUNG TRONG TEMPLATE NÀY
+         ===================================================== -->
+    <p><b>4 Càng</b></p>
+    <p>Nhập nội dung hướng dẫn cách chơi của tab <b>4 Càng</b> tại đây.</p>
+    <p>Bạn có thể thêm nhiều dòng <code>&lt;p&gt;...&lt;/p&gt;</code> tùy ý.</p>
+  </template>
+
+
+<!-- Auth modal -->
+<div id="authModal" class="modal hidden"><div class="modal-card"><button id="closeAuth" class="modal-close">×</button>
+  <div id="loginPane"><h2>Đăng nhập demo</h2><input id="loginUser" placeholder="Tên đăng nhập"><input id="loginPass" type="password" placeholder="Mật khẩu"><button id="doLogin" class="blue-btn full">Đăng nhập</button><p>Chưa có tài khoản? <button id="showRegister" class="link-btn">Đăng ký</button></p></div>
+  <div id="registerPane" class="hidden"><h2>Đăng ký demo</h2><input id="registerUser" placeholder="Tên đăng nhập"><input id="registerPass" type="password" placeholder="Mật khẩu"><button id="doRegister" class="blue-btn full">Tạo tài khoản</button><p>Đã có tài khoản? <button id="showLogin" class="link-btn">Đăng nhập</button></p></div>
+</div></div>
+
+<!-- Hộp quà nạp tiền -->
+<div id="walletGift" class="wallet-gift-popover hidden" role="dialog" aria-label="Phần thưởng nạp tiền">
+  <button id="closeWalletGift" class="wallet-gift-close" type="button" aria-label="Đóng">×</button>
+  <h3>Phần thưởng nạp tiền</h3>
+  <strong id="walletGiftText">Nạp 1 triệu nhận 3 triệu</strong>
+  <p>Ưu đãi áp dụng cho lần nạp đầu tiên.</p>
+  <button id="giftDepositNow" class="wallet-primary-btn" type="button">Nạp ngay</button>
+</div>
+
+<!-- Popup nạp tiền và tạo QR -->
+<div id="depositModal" class="modal hidden" aria-hidden="true">
+  <div class="modal-card wallet-modal-card" role="dialog" aria-modal="true" aria-labelledby="depositTitle">
+    <button id="closeDeposit" class="modal-close" type="button" aria-label="Đóng">×</button>
+    <h2 id="depositTitle">🎁 Nạp tiền</h2>
+    <p id="depositOfferText" class="wallet-modal-note">Lần nạp đầu được nhận x3 giá trị.</p>
+
+    <form id="depositForm" class="wallet-form">
+      <label for="depositAmount">Số tiền nạp</label>
+      <input id="depositAmount" type="number" min="1000000" step="1000" placeholder="Tối thiểu 1.000.000" required>
+      <p id="depositBonus" class="deposit-bonus">Nhập số tiền để xem giá trị nhận.</p>
+      <button id="createDepositQr" class="wallet-primary-btn" type="submit">Đăng ký &amp; lấy QR</button>
+    </form>
+
+    <section id="depositQrBox" class="deposit-qr-box hidden">
+      <p id="depositStatus"><b>Đang tạo QR...</b></p>
+      <div id="depositCountdown" class="deposit-countdown">02:00</div>
+      <div id="depositQrImage" class="deposit-qr-image"></div>
+
+      <div id="depositProof" class="deposit-proof hidden">
+        <label for="depositUpload">Ảnh xác nhận chuyển khoản</label>
+        <input id="depositUpload" type="file" accept="image/*">
+        <button id="confirmDeposit" class="wallet-primary-btn" type="button">Đã chuyển khoản</button>
+        <p id="depositMessage" class="wallet-message"></p>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- Popup rút tiền -->
+<div id="withdrawModal" class="modal hidden" aria-hidden="true">
+  <div class="modal-card wallet-modal-card" role="dialog" aria-modal="true" aria-labelledby="withdrawTitle">
+    <button id="closeWithdraw" class="modal-close" type="button" aria-label="Đóng">×</button>
+    <h2 id="withdrawTitle">💸 Yêu cầu rút tiền</h2>
+    <p class="wallet-modal-note">Tiền sẽ được giữ lại trong lúc chờ xác minh.</p>
+    <div class="wallet-form">
+      <label for="withdrawAmount">Số tiền muốn rút</label>
+      <input id="withdrawAmount" type="number" min="1" step="1000" placeholder="Nhập số tiền">
+      <button id="confirmWithdraw" class="wallet-primary-btn" type="button">Gửi yêu cầu</button>
+      <p id="withdrawMessage" class="wallet-message"></p>
+    </div>
+  </div>
+</div>
+
+<!-- Thông báo hoạt động mô phỏng -->
+<div id="liveFeed" class="live-feed" aria-live="polite"></div>
+
+<!-- =======================================================
+     FOOTER LIÊN HỆ
+     - Hàng liên hệ được dựng bằng HTML/CSS
+     - Ảnh logo xanh chỉ hiện trên desktop
+     ======================================================= -->
+<footer class="site-footer" aria-label="Thông tin liên hệ và đối tác">
+  <div class="contact-strip">
+    <div class="contact-strip__inner">
+      <!-- Khi có số thật, thay # bằng tel:SO_DIEN_THOAI -->
+      <a class="contact-item" href="#">
+        <span class="contact-item__icon" aria-hidden="true">
+          <svg viewBox="0 0 64 64">
+            <circle cx="32" cy="32" r="27"></circle>
+            <path d="M23 18c-2 1-5 5-5 8 0 9 11 21 20 22 4 1 8-3 9-6l-8-7-5 5c-5-2-9-6-11-11l5-4-5-7z"></path>
+          </svg>
+        </span>
+        <span class="contact-item__text">Điện thoại liên lạc</span>
+      </a>
+
+      <a class="contact-item" href="mailto:123b88com@gmail.com">
+        <span class="contact-item__icon" aria-hidden="true">
+          <svg viewBox="0 0 64 64">
+            <circle cx="32" cy="32" r="27"></circle>
+            <rect x="16" y="21" width="32" height="23" rx="2"></rect>
+            <path d="m17 23 15 13 15-13"></path>
+          </svg>
+        </span>
+        <span class="contact-item__text">123b88com@gmail.com</span>
+      </a>
+
+      <!-- Thay # bằng link trang đại lý -->
+      <a class="contact-item" href="#">
+        <span class="contact-item__icon" aria-hidden="true">
+          <svg viewBox="0 0 64 64">
+            <circle cx="32" cy="32" r="27"></circle>
+            <path d="m13 31 9-7 9 7-8 8-10-8zm38 0-9-7-9 7 8 8 10-8zM23 40l5 5c2 2 5 2 7 0l6-6M25 27l4-4c2-2 5-2 7 0l3 3"></path>
+          </svg>
+        </span>
+        <span class="contact-item__text">Đại lý</span>
+      </a>
+
+      <!-- Thay # bằng link trang hướng dẫn -->
+      <a class="contact-item" href="#">
+        <span class="contact-item__icon" aria-hidden="true">
+          <svg viewBox="0 0 64 64">
+            <circle cx="32" cy="32" r="27"></circle>
+            <path d="M32 14 47 20v11c0 10-6 17-15 21-9-4-15-11-15-21V20l15-6z"></path>
+            <path d="M32 20v25M23 28h18"></path>
+          </svg>
+        </span>
+        <span class="contact-item__text">Hướng dẫn chống hack DNS</span>
+      </a>
+
+      <!-- Thay # bằng link chăm sóc khách hàng -->
+      <a class="contact-item" href="#">
+        <span class="contact-item__icon" aria-hidden="true">
+          <svg viewBox="0 0 64 64">
+            <circle cx="32" cy="32" r="27"></circle>
+            <path d="M19 34v-5a13 13 0 0 1 26 0v5M18 32h7v12h-5c-2 0-3-2-3-4v-5c0-2 0-3 1-3zm28 0h-7v12h5c2 0 3-2 3-4v-5c0-2 0-3-1-3zM39 47c-2 2-4 3-7 3"></path>
+          </svg>
+        </span>
+        <span class="contact-item__text">Chăm sóc khách hàng</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="brand-strip" aria-hidden="true">
+    <img
+      class="brand-strip__image"
+      src="./footer-partners-desktop.png"
+      alt=""
+      width="1906"
+      height="235"
+      loading="lazy"
+    >
+  </div>
+</footer>
+
+<script src="app.js"></script>
+<script src="wallet-account.js"></script>
+</body>
+</html>
