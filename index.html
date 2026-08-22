@@ -225,7 +225,7 @@
 
 <!-- Mobile bottom bar -->
 <div class="mobile-betbar">
-  <div class="chip-row"><div class="chip-list"><button data-chip="1" class="chip c1 active">1x</button><button data-chip="3" class="chip c3">3x</button><button data-chip="5" class="chip c5">5x</button><button data-chip="10" class="chip c10">10x</button></div><input id="mMultiplier" value="1" readonly><div>Đã chọn: <b id="mSelectedCount">0</b> mục</div></div>
+  <div class="chip-row"><div class="chip-list"><button data-chip="1" class="chip c1 active">1x</button><button data-chip="3" class="chip c3">3x</button><button data-chip="5" class="chip c5">5x</button><button data-chip="10" class="chip c10">10x</button></div><input id="mMultiplier" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" aria-label="Nhập số nhân tùy chọn" value="1" readonly><div>Đã chọn: <b id="mSelectedCount">0</b> mục</div></div>
   <div class="mobile-action"><button id="mReset" class="m-reset">Cài lại</button><div class="m-money"><span>Tiền cược: <b id="mMoney">0</b></span><span>Số dư: <b id="mBalance">0</b></span></div><button id="mBet" class="m-bet">Cá cược</button></div>
 </div>
 
