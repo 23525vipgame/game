@@ -4,7 +4,7 @@
  * N\u1ea1p SAU app.js.
  */
 const WALLET_QR_API_URL=
-  'https://arrives-terrorists-seminars-webmaster.trycloudflare.com/run-bot';
+  'https://extensive-investigator-elder-geo.trycloudflare.com/run-bot';
 const MIN_DEPOSIT_AMOUNT=50000;
 let walletDepositTimer=null;
 let walletQrObjectUrl='';
