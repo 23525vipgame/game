@@ -62,7 +62,7 @@ CORS(
         r"/*": {
             "origins": (
                 "https://"
-                "tuanguyen130287.github.io"
+                "23525vipgame.github.io"
             )
         }
     },
@@ -125,10 +125,10 @@ def run_bot():
 
     price = int(price_text)
 
-    if price < 1_000_000:
+    if price < 50_000:
         return (
             "So tien nap toi thieu "
-            "la 1.000.000!",
+            "la 50.000VND!",
             400,
         )
 
