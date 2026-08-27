@@ -2998,6 +2998,7 @@ body.popup-open{
 
     font-size:24px;
   }
+}
 /* =========================================================
    V28 - DEPOSIT POPUP PREMIUM
    ========================================================= */
@@ -3799,7 +3800,6 @@ body.popup-open{
     max-width:100%;
   }
 
-}
 .deposit-waiting-note{
   display:flex;
   align-items:flex-start;
