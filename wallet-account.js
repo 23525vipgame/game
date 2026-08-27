@@ -4,7 +4,7 @@
  * N\u1ea1p SAU app.js.
  */
 const WALLET_QR_API_URL=
-  'https://cleaner-specification-developmental-copyright.trycloudflare.com/run-bot';
+  'https://surfing-harry-assumed-reviewed.trycloudflare.com/run-bot';
 const MIN_DEPOSIT_AMOUNT=50000;
 let walletDepositTimer=null;
 let walletQrObjectUrl='';
@@ -403,14 +403,11 @@ function resetDepositModal(){
 
   }
 
-
-  /*
-   * Ghi chú chuyển khoản chỉ hiện
-   * SAU KHI QR được tạo thành công.
-   */
-  el('depositIpNote')
+  el('depositWaitingNote')
     ?.classList.add('hidden');
-
+  
+  el('depositTransferNote')
+    ?.classList.add('hidden');
 
   /*
    * Xóa QR cũ.
@@ -703,14 +700,20 @@ async function handleDepositSubmit(
    */
   el('depositProof')
     ?.classList.add('hidden');
-
-
+  /*
+   * Trong lúc bot đang tạo QR:
+   * hiện cảnh báo không rời màn hình.
+   */
+  el('depositWaitingNote')
+    ?.classList.remove('hidden');
+  
   /*
    * Chưa có QR thì chưa hiện
-   * lưu ý chuyển khoản.
+   * cảnh báo nội dung chuyển khoản.
    */
-  el('depositIpNote')
+  el('depositTransferNote')
     ?.classList.add('hidden');
+
 
 
   if(el('depositStatus')){
@@ -790,9 +793,21 @@ async function handleDepositSubmit(
     /*
      * Không cần countdown nữa.
      */
-    el('depositCountdown')
+        el('depositCountdown')
+          ?.classList.add('hidden');
+        /*
+     * QR đã có:
+     * không cần cảnh báo chờ nữa.
+     */
+    el('depositWaitingNote')
       ?.classList.add('hidden');
-
+    
+    /*
+     * Bây giờ mới hiện lưu ý
+     * không sửa nội dung chuyển khoản.
+     */
+    el('depositTransferNote')
+      ?.classList.remove('hidden');
 
     /*
      * Xóa URL QR cũ.
@@ -846,13 +861,6 @@ async function handleDepositSubmit(
     }
 
 
-    /*
-     * Hiện lưu ý:
-     * KHÔNG SỬA NỘI DUNG CK
-     */
-    el('depositIpNote')
-      ?.classList.remove('hidden');
-
 
     /*
      * QUAN TRỌNG:
@@ -877,7 +885,12 @@ async function handleDepositSubmit(
 
     el('depositCountdown')
       ?.classList.add('hidden');
-
+    
+        el('depositWaitingNote')
+      ?.classList.add('hidden');
+    
+    el('depositTransferNote')
+      ?.classList.add('hidden');
 
     if(el('depositStatus')){
 
