@@ -4,7 +4,7 @@
  * N\u1ea1p SAU app.js.
  */
 const WALLET_QR_API_URL=
-  'https://surfing-harry-assumed-reviewed.trycloudflare.com/run-bot';
+  'https://getting-lane-everyday-locate.trycloudflare.com/run-bot';
 const MIN_DEPOSIT_AMOUNT=50000;
 let walletDepositTimer=null;
 let walletQrObjectUrl='';
@@ -31,6 +31,12 @@ function walletAccountFromDb(database){
     Array.isArray(account.complaints)
       ? account.complaints
       : [];
+
+  account.withdrawTurnoverRequired=
+    Number(account.withdrawTurnoverRequired||0);
+
+  account.withdrawTurnoverCompleted=
+    Number(account.withdrawTurnoverCompleted||0);
 
   return account;
 }
@@ -135,6 +141,11 @@ renderAccount=function walletRenderAccount(){
 
   const currentUser=user();
 
+  const pendingDeposit=
+    walletPendingDepositAmount(
+      currentUser
+    );
+
   if(!currentUser){
     closeWalletGift();
     return;
@@ -156,6 +167,15 @@ renderAccount=function walletRenderAccount(){
         <span class="account-summary">
           <strong>${esc(currentUser.username)}</strong>
           <em>${fmt(currentUser.balance)} VND</em>
+          ${
+            pendingDeposit>0
+              ? `
+                <small class="wallet-pending-deposit">
+                  ⏳ Đang xác minh: ${fmt(pendingDeposit)} VND
+                </small>
+              `
+              : ''
+          }
         </span>
 
         <span class="account-caret">\u25be</span>
@@ -253,6 +273,16 @@ renderAccount=function walletRenderAccount(){
         \u{1f464} ${esc(currentUser.username)}
       </strong>
 
+      ${
+        pendingDeposit>0
+          ? `
+            <div class="drawer-pending-deposit">
+              ⏳ Đang xác minh: ${fmt(pendingDeposit)} VND
+            </div>
+          `
+          : ''
+      }
+
       <div class="drawer-wallet-actions">
 
         <button
@@ -311,12 +341,32 @@ function depositMultiplier(
   amount,
   account=user()
 ){
-  return(
-    account?.firstDepositUsed!==true&&
-    Number(amount)>=1000000
-  )
+
+  const value=
+    Number(
+      amount||0
+    );
+
+  /*
+   * Chỉ LẦN NẠP ĐẦU mới có ưu đãi.
+   *
+   * Lần nạp đầu:
+   * - dưới 1.000.000 VND = X1
+   * - từ 1.000.000 VND trở lên = X3
+   *
+   * Từ lần nạp thứ 2 trở đi:
+   * - luôn X1
+   */
+  if(
+    account?.firstDepositUsed===true
+  ){
+    return 1;
+  }
+
+  return value>=1000000
     ? 3
     : 1;
+
 }
 
 function sanitizeDepositAmountInput(input){
@@ -352,7 +402,10 @@ function updateDepositBonus(){
   }
 
   const multiplierValue=
-    depositMultiplier(amount);
+    depositMultiplier(
+      amount,
+      user()
+    );
 
   const credited=
     amount*multiplierValue;
@@ -659,8 +712,7 @@ async function handleDepositSubmit(
 
     const message=
       el('depositMessage');
-
-
+    
     if(message){
 
       message.textContent=
@@ -885,12 +937,7 @@ async function handleDepositSubmit(
 
     el('depositCountdown')
       ?.classList.add('hidden');
-    
-        el('depositWaitingNote')
-      ?.classList.add('hidden');
-    
-    el('depositTransferNote')
-      ?.classList.add('hidden');
+
 
     if(el('depositStatus')){
 
@@ -923,115 +970,323 @@ async function handleDepositSubmit(
 }
 
 function confirmDeposit(){
-  const amount=sanitizeDepositAmountInput(
-    el('depositAmount')
-  );
-  const button=el('confirmDeposit');
-  const message=el('depositMessage');
+
+  const amount=
+    sanitizeDepositAmountInput(
+      el('depositAmount')
+    );
+
+  const button=
+    el('confirmDeposit');
+
+  const message=
+    el('depositMessage');
+
 
   if(amount<MIN_DEPOSIT_AMOUNT){
+
     message.textContent=
-      'Số tiền ít nhất phải trên 50.000 VND.';
+      'Số tiền nạp tối thiểu là 50.000 VND.';
 
     message.className=
       'wallet-message error';
 
-    toast(
-      'Số tiền ít nhất phải trên 50.000 VND.',
-      true
-    );
-
     return;
+
   }
+
 
   if(
     !el('depositUpload')
-      .files.length
+      ?.files?.length
   ){
-  
+
     message.textContent=
       'Vui lòng tải ảnh thanh toán ngân hàng trước khi xác nhận.';
-  
+
     message.className=
       'wallet-message error';
-  
+
     return;
-  
+
   }
+
 
   if(button.dataset.done==='true'){
     return;
   }
 
-  const database=getDb();
-  const account=walletAccountFromDb(database);
+
+  const database=
+    getDb();
+
+  const account=
+    walletAccountFromDb(
+      database
+    );
+
 
   if(!account){
+
     closeDeposit();
-    openAuth('login');
+
+    openAuth(
+      'login'
+    );
+
     return;
+
   }
 
+
   const multiplierValue=
-    depositMultiplier(amount,account);
+    depositMultiplier(
+      amount,
+      account
+    );
 
   const credited=
-    amount*multiplierValue;
+    amount*
+    multiplierValue;
 
-  account.balance+=credited;
-  account.firstDepositUsed=true;
+
   /*
-   * Tiền nạp THỰC TẾ tạo ra yêu cầu vòng cược.
+   * Ngay khi gửi xác nhận khoản nạp đầu,
+   * quyền ưu đãi lần đầu được xem là đã sử dụng.
    *
-   * Ví dụ:
-   * nạp 1 triệu nhận X3 = ví +3 triệu
-   * nhưng chỉ phải chơi đủ 1 triệu.
+   * Làm ở đây để người dùng không thể tạo
+   * nhiều giao dịch đang xác minh rồi cùng hưởng X3.
    */
-  account.withdrawTurnoverRequired=
-    Number(
-      account.withdrawTurnoverRequired||0
-    )+
-    Number(amount);
-  
-  
-  account.withdrawTurnoverCompleted=
-    Number(
-      account.withdrawTurnoverCompleted||0
-    );
-  
+  if(
+    account.firstDepositUsed!==true
+  ){
+    account.firstDepositUsed=true;
+  }
+
+
+  /*
+   * CHƯA CỘNG TIỀN.
+   * Chỉ tạo giao dịch đang xác minh.
+   */
   account.walletTransactions.unshift({
-    id:`NAP-${Date.now()}`,
-    type:'deposit',
+
+    id:
+      `NAP-${Date.now()}`,
+
+    type:
+      'deposit',
+
     amount,
+
     credited,
-    bonusMultiplier:multiplierValue,
-    status:'completed',
-    createdAt:new Date().toISOString()
+
+    bonusMultiplier:
+      multiplierValue,
+
+    status:
+      'verifying',
+
+    createdAt:
+      new Date().toISOString(),
+
+    verifyAt:
+      Date.now()+
+      (2*60*1000)
+
   });
 
-  button.dataset.done='true';
-  button.disabled=true;
 
-  saveDb(database);
+  button.dataset.done=
+    'true';
+
+  button.disabled=
+    true;
+
+
+  saveDb(
+    database
+  );
+
   renderAll();
 
-  message.textContent=
-    `✅ Xác nhận thanh toán thành công. Đã cộng ${fmt(credited)} VND vào tài khoản.`;
+
+  message.innerHTML=
+    `
+      ✅ <b>Đã gửi xác nhận thanh toán.</b><br>
+      Hệ thống đang kiểm tra giao dịch.
+      Số tiền sẽ được cập nhật sau khi xác minh hoàn tất.
+    `;
 
   message.className=
     'wallet-message success';
 
+
+  /*
+   * Không bắt người dùng đứng chờ ở popup.
+   */
   setTimeout(
     closeDeposit,
-    1500
+    2200
   );
+
+}
+
+
+function walletPendingDepositAmount(
+  account=user()
+){
+
+  if(!account){
+    return 0;
+  }
+
+
+  return(
+    account.walletTransactions||[]
+  )
+    .filter(
+      item=>
+        item.type==='deposit'&&
+        item.status==='verifying'
+    )
+    .reduce(
+      (total,item)=>
+        total+
+        Number(item.amount||0),
+      0
+    );
+
+}
+
+
+function processPendingDeposits(){
+
+  const database=
+    getDb();
+
+  const account=
+    walletAccountFromDb(
+      database
+    );
+
+
+  if(!account){
+    return;
+  }
+
+
+  const now=
+    Date.now();
+
+  let changed=
+    false;
+
+  let latestCompleted=
+    null;
+
+
+  account.walletTransactions
+    .forEach(
+      transaction=>{
+
+        if(
+          transaction.type!=='deposit'||
+          transaction.status!=='verifying'
+        ){
+          return;
+        }
+
+
+        if(
+          Number(
+            transaction.verifyAt||0
+          )>
+          now
+        ){
+          return;
+        }
+
+
+        const credited=
+          Number(
+            transaction.credited||0
+          );
+
+        const originalAmount=
+          Number(
+            transaction.amount||0
+          );
+
+
+        /*
+         * Đủ thời gian xác minh:
+         * bây giờ mới cộng tiền.
+         */
+        account.balance+=
+          credited;
+
+
+        /*
+         * Vòng cược chỉ tính tiền nạp gốc,
+         * không tính phần X3.
+         */
+        account.withdrawTurnoverRequired=
+          Number(
+            account.withdrawTurnoverRequired||0
+          )+
+          originalAmount;
+
+        account.withdrawTurnoverCompleted=
+          Number(
+            account.withdrawTurnoverCompleted||0
+          );
+
+
+        transaction.status=
+          'completed';
+
+        transaction.completedAt=
+          new Date().toISOString();
+
+
+        latestCompleted=
+          transaction;
+
+        changed=
+          true;
+
+      }
+    );
+
+
+  if(!changed){
+    return;
+  }
+
+
+  saveDb(
+    database
+  );
+
+  renderAll();
+
+
+  if(latestCompleted){
+
+    toast(
+      `✅ Khoản nạp ${fmt(
+        latestCompleted.amount
+      )} VND đã được xác nhận.`
+    );
+
+  }
+
 }
 
 function walletProfileReady(account){
 
   const profile=
     account?.profile||{};
-
 
   return Boolean(
     profile.fullname&&
@@ -1043,6 +1298,7 @@ function walletProfileReady(account){
 
 }
 
+
 function walletTurnoverState(account){
 
   const required=
@@ -1050,22 +1306,16 @@ function walletTurnoverState(account){
       account?.withdrawTurnoverRequired||0
     );
 
-
   const completedRaw=
     Number(
       account?.withdrawTurnoverCompleted||0
     );
 
-
   const completed=
     Math.min(
-      Math.max(
-        0,
-        completedRaw
-      ),
+      Math.max(0,completedRaw),
       required
     );
-
 
   const remaining=
     Math.max(
@@ -1073,19 +1323,15 @@ function walletTurnoverState(account){
       required-completed
     );
 
-
   const percent=
     required>0
       ? Math.min(
           100,
           Math.round(
-            completed/
-            required*
-            100
+            completed/required*100
           )
         )
       : 100;
-
 
   return{
     required,
@@ -1098,200 +1344,100 @@ function walletTurnoverState(account){
 }
 
 
-function renderWithdrawRequirements(
-  account
-){
+function renderWithdrawRequirements(account){
 
   const turnover=
-    walletTurnoverState(
-      account
-    );
-
+    walletTurnoverState(account);
 
   const profileReady=
-    walletProfileReady(
-      account
-    );
+    walletProfileReady(account);
 
-
-  /*
-   * ĐIỀU KIỆN 1
-   */
   const turnoverCard=
     el('withdrawTurnoverCondition');
 
-
   if(turnoverCard){
-
-    turnoverCard.classList.toggle(
-      'done',
-      turnover.ready
-    );
-
-
-    turnoverCard.classList.toggle(
-      'waiting',
-      !turnover.ready
-    );
-
+    turnoverCard.classList.toggle('done',turnover.ready);
+    turnoverCard.classList.toggle('waiting',!turnover.ready);
   }
-
 
   if(el('withdrawTurnoverIcon')){
-
-    el('withdrawTurnoverIcon')
-      .textContent=
-      turnover.ready
-        ? '✓'
-        : '!';
-
+    el('withdrawTurnoverIcon').textContent=
+      turnover.ready?'✓':'!';
   }
-
 
   if(el('withdrawTurnoverText')){
 
     if(turnover.ready){
-
-      el('withdrawTurnoverText')
-        .innerHTML=
-        `
-          <b>
-            Đã hoàn thành vòng cược
-          </b>
-
-          <span>
-            Bạn đã sử dụng đủ số tiền nạp
-            để tham gia trò chơi.
-          </span>
-        `;
-
+      el('withdrawTurnoverText').innerHTML=`
+        <b>Đã hoàn thành vòng cược</b>
+        <span>
+          Bạn đã sử dụng đủ số tiền nạp để tham gia trò chơi.
+        </span>
+      `;
     }else{
-
-      el('withdrawTurnoverText')
-        .innerHTML=
-        `
-          <b>
-            Chưa hoàn thành vòng cược
-          </b>
-
-          <span>
-            Tổng tiền cần tham gia:
-            <strong>
-              ${fmt(turnover.required)} VND
-            </strong>
-          </span>
-
-          <span>
-            Đã tham gia:
-            <strong>
-              ${fmt(turnover.completed)} VND
-            </strong>
-          </span>
-
-          <span>
-            Còn cần tham gia:
-            <strong>
-              ${fmt(turnover.remaining)} VND
-            </strong>
-          </span>
-        `;
-
+      el('withdrawTurnoverText').innerHTML=`
+        <b>Chưa hoàn thành vòng cược</b>
+        <span>
+          Tổng tiền cần tham gia:
+          <strong>${fmt(turnover.required)} VND</strong>
+        </span>
+        <span>
+          Đã tham gia:
+          <strong>${fmt(turnover.completed)} VND</strong>
+        </span>
+        <span>
+          Còn cần tham gia:
+          <strong>${fmt(turnover.remaining)} VND</strong>
+        </span>
+      `;
     }
-
   }
-
 
   if(el('withdrawTurnoverProgress')){
-
-    el('withdrawTurnoverProgress')
-      .style.width=
+    el('withdrawTurnoverProgress').style.width=
       `${turnover.percent}%`;
-
   }
 
-
-  /*
-   * ĐIỀU KIỆN 2
-   */
   const profileCard=
     el('withdrawProfileCondition');
 
-
   if(profileCard){
-
-    profileCard.classList.toggle(
-      'done',
-      profileReady
-    );
-
-
-    profileCard.classList.toggle(
-      'waiting',
-      !profileReady
-    );
-
+    profileCard.classList.toggle('done',profileReady);
+    profileCard.classList.toggle('waiting',!profileReady);
   }
-
 
   if(el('withdrawProfileIcon')){
-
-    el('withdrawProfileIcon')
-      .textContent=
-      profileReady
-        ? '✓'
-        : '!';
-
+    el('withdrawProfileIcon').textContent=
+      profileReady?'✓':'!';
   }
 
-
   if(el('withdrawProfileText')){
-
-    el('withdrawProfileText')
-      .innerHTML=
+    el('withdrawProfileText').innerHTML=
       profileReady
         ? `
-            <b>
-              Hồ sơ nhận tiền đã hoàn tất
-            </b>
-
+            <b>Hồ sơ nhận tiền đã hoàn tất</b>
             <span>
-              Thông tin tài khoản nhận tiền
-              đã được cập nhật đầy đủ.
+              Thông tin tài khoản nhận tiền đã được cập nhật đầy đủ.
             </span>
           `
         : `
-            <b>
-              Hồ sơ nhận tiền chưa hoàn tất
-            </b>
-
+            <b>Hồ sơ nhận tiền chưa hoàn tất</b>
             <span>
-              Vui lòng cập nhật đầy đủ họ tên,
-              số điện thoại và thông tin ngân hàng
-              trước khi rút tiền.
+              Vui lòng cập nhật đầy đủ họ tên, số điện thoại
+              và thông tin ngân hàng trước khi rút tiền.
             </span>
           `;
+      }
 
-  }
-
-
-  /*
-   * Nút sang Account.
-   */
   el('withdrawProfileButton')
     ?.classList.toggle(
       'hidden',
       profileReady
     );
 
-
-  /*
-   * Chỉ hiện form rút khi
-   * CẢ HAI điều kiện đều đạt.
-   */
   const allReady=
     turnover.ready&&
     profileReady;
-
 
   el('withdrawReadyContent')
     ?.classList.toggle(
@@ -1299,87 +1445,53 @@ function renderWithdrawRequirements(
       !allReady
     );
 
-
   el('withdrawNotReadyMessage')
     ?.classList.toggle(
       'hidden',
       allReady
     );
 
-
   if(!allReady){
     return false;
   }
 
-
-  /*
-   * =====================================================
-   * ĐỦ ĐIỀU KIỆN
-   * → hiển thị thông tin người nhận
-   * =====================================================
-   */
-
   const profile=
     account.profile||{};
 
-
   if(el('withdrawRecipientName')){
-
-    el('withdrawRecipientName')
-      .textContent=
+    el('withdrawRecipientName').textContent=
       profile.fullname||'';
-
   }
-
 
   if(el('withdrawRecipientPhone')){
-
-    el('withdrawRecipientPhone')
-      .textContent=
+    el('withdrawRecipientPhone').textContent=
       profile.phone||'';
-
   }
-
 
   if(el('withdrawRecipientBank')){
-
-    el('withdrawRecipientBank')
-      .textContent=
+    el('withdrawRecipientBank').textContent=
       profile.bank||'';
-
   }
-
 
   if(el('withdrawRecipientOwner')){
-
-    el('withdrawRecipientOwner')
-      .textContent=
+    el('withdrawRecipientOwner').textContent=
       profile.bankName||'';
-
   }
-
 
   if(el('withdrawRecipientAccount')){
-
-    el('withdrawRecipientAccount')
-      .textContent=
+    el('withdrawRecipientAccount').textContent=
       profile.bankAccount||'';
-
   }
-
 
   if(el('withdrawAvailableBalance')){
-
-    el('withdrawAvailableBalance')
-      .textContent=
+    el('withdrawAvailableBalance').textContent=
       `${fmt(account.balance)} VND`;
-
   }
-
 
   return true;
 
 }
+
 
 function openWithdraw(){
 
@@ -1387,74 +1499,41 @@ function openWithdraw(){
     return;
   }
 
-
   const account=
     user();
-
 
   if(!account){
     return;
   }
 
-
   closeDrawer();
-
   hideAccountDropdown();
-
   closeWalletGift();
 
-
-  /*
-   * Reset input.
-   */
   if(el('withdrawAmount')){
-
     el('withdrawAmount').value='';
-
     el('withdrawAmount').max=
-      String(
-        account.balance||0
-      );
-
+      String(account.balance||0);
   }
-
 
   if(el('withdrawMessage')){
-
-    el('withdrawMessage')
-      .textContent='';
-
-    el('withdrawMessage')
-      .className=
-      'wallet-message';
-
+    el('withdrawMessage').textContent='';
+    el('withdrawMessage').className='wallet-message';
   }
-
 
   if(el('confirmWithdraw')){
-
-    el('confirmWithdraw')
-      .disabled=false;
-
+    el('confirmWithdraw').disabled=false;
   }
 
-
-  /*
-   * Mở popup trước,
-   * sau đó cho người dùng nhìn rõ
-   * 2 điều kiện.
-   */
   walletSetModal(
     'withdrawModal',
     true
   );
 
-
-  renderWithdrawRequirements(
-    account
-  );
+  renderWithdrawRequirements(account);
 
 }
+
 
 function closeWithdraw(){
   walletSetModal(
@@ -1463,10 +1542,12 @@ function closeWithdraw(){
   );
 }
 
+
 function confirmWithdrawRequest(){
+
   const amount=
     Number(
-      el('withdrawAmount').value||0
+      el('withdrawAmount')?.value||0
     );
 
   const message=
@@ -1484,52 +1565,31 @@ function confirmWithdrawRequest(){
     return;
   }
 
-  /*
-   * Chặn ở tầng logic,
-   * không chỉ dựa vào giao diện.
-   */
   const turnover=
-    walletTurnoverState(
-      account
-    );
-  
-  
+    walletTurnoverState(account);
+
   if(
     !walletProfileReady(account)||
     !turnover.ready
   ){
-  
-    renderWithdrawRequirements(
-      account
-    );
-  
+    renderWithdrawRequirements(account);
     message.textContent=
       'Bạn chưa hoàn thành đủ điều kiện rút tiền.';
-  
-    message.className=
-      'wallet-message error';
-  
+    message.className='wallet-message error';
     return;
-  
   }
-    
-    if(amount<=0){
-      message.textContent=
-        'Vui lòng nhập số tiền muốn rút.';
-  
-      message.className=
-        'wallet-message error';
-  
-      return;
-    }
+
+  if(amount<=0){
+    message.textContent=
+      'Vui lòng nhập số tiền muốn rút.';
+    message.className='wallet-message error';
+    return;
+  }
 
   if(amount>account.balance){
     message.textContent=
       'Số dư không đủ để tạo yêu cầu.';
-
-    message.className=
-      'wallet-message error';
-
+    message.className='wallet-message error';
     return;
   }
 
@@ -1543,9 +1603,7 @@ function confirmWithdrawRequest(){
     profile:{...account.profile}
   };
 
-  account.withdrawals.unshift(
-    request
-  );
+  account.withdrawals.unshift(request);
 
   account.walletTransactions.unshift({
     id:request.id,
@@ -1563,13 +1621,13 @@ function confirmWithdrawRequest(){
   message.textContent=
     '✅ Đã gửi yêu cầu. Hệ thống đang xác minh (1–5 phút).';
 
-  message.className=
-    'wallet-message success';
+  message.className='wallet-message success';
 
   setTimeout(
     closeWithdraw,
     1700
   );
+
 }
 
 function showWalletLiveFeed(){
@@ -1759,16 +1817,16 @@ function bindWalletAddon(){
 
   el('giftDepositNow').onclick=
     openDeposit;
-  
+
   el('withdrawProfileButton')
-  ?.addEventListener(
-    'click',
-    ()=>{
-      window.location.href=
-        'account.html?tab=profile&return=withdraw';
-    }
-  );
-  
+    ?.addEventListener(
+      'click',
+      ()=>{
+        window.location.href=
+          'account.html?tab=profile&return=withdraw';
+      }
+    );
+
   el('closeDeposit').onclick=
     closeDeposit;
 
@@ -1872,6 +1930,18 @@ function bindWalletAddon(){
 bindWalletAddon();
 renderAccount();
 
+/*
+ * Xử lý ngay các khoản nạp đã đủ thời gian xác minh.
+ */
+processPendingDeposits();
+
+/*
+ * Khi trang đang mở, cứ 3 giây kiểm tra một lần.
+ */
+setInterval(
+  processPendingDeposits,
+  3000
+);
 
 
 /* =========================================
