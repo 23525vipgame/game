@@ -154,117 +154,289 @@ renderAccount=function walletRenderAccount(){
   const eligible=currentUser.firstDepositUsed!==true;
   const desktop=el('desktopAuth');
 
-  desktop.innerHTML=`
-    <div class="desktop-user account-menu-shell">
+desktop.innerHTML=`
+  <div class="desktop-user account-menu-shell">
 
-      <button
-        id="accountMenuToggle"
-        class="account-menu-toggle"
-        type="button"
-      >
-        <span class="account-avatar">\u{1f464}</span>
 
-        <span class="account-summary">
-          <strong>${esc(currentUser.username)}</strong>
-          <em>${fmt(currentUser.balance)} VND</em>
-          ${
-            pendingDeposit>0
-              ? `
-                <small class="wallet-pending-deposit">
-                  ⏳ Đang xác minh: ${fmt(pendingDeposit)} VND
-                </small>
-              `
-              : ''
-          }
-        </span>
+    <!-- NÚT TRÊN HEADER -->
+    <button
+      id="accountMenuToggle"
+      class="account-menu-toggle"
+      type="button"
+    >
 
-        <span class="account-caret">\u25be</span>
-      </button>
+      <span class="account-avatar">
+        👤
+      </span>
 
-      <div
-        id="accountDropdown"
-        class="account-dropdown hidden"
-      >
+
+      <span class="account-summary">
+
+        <strong>
+          ${esc(currentUser.username)}
+        </strong>
+
+        <em>
+          ${fmt(currentUser.balance)} VND
+        </em>
+
+        ${
+          pendingDeposit>0
+            ? `
+              <small class="wallet-pending-deposit">
+                ⏳ Đang xác minh:
+                ${fmt(pendingDeposit)} VND
+              </small>
+            `
+            : ''
+        }
+
+      </span>
+
+
+      <span class="account-caret">
+        ▾
+      </span>
+
+    </button>
+
+
+    <!-- =========================================
+         DROPDOWN
+         ========================================= -->
+    <div
+      id="accountDropdown"
+      class="account-dropdown account-dropdown-modern hidden"
+    >
+
+
+      <!-- THÔNG TIN ACCOUNT -->
+      <div class="account-dropdown-head">
+
+        <div class="account-dropdown-avatar">
+          👤
+        </div>
+
+
+        <div class="account-dropdown-user">
+
+          <strong>
+            ${esc(currentUser.username)}
+          </strong>
+
+          <span>
+            Hồ sơ và ví của tôi
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <!-- BALANCE -->
+      <div class="account-dropdown-balance">
+
+        <div>
+
+          <span>
+            Tài khoản chính (VND)
+          </span>
+
+          <strong>
+            ${fmt(currentUser.balance)}
+          </strong>
+
+        </div>
+
+
+        ${
+          pendingDeposit>0
+            ? `
+              <div class="account-dropdown-pending">
+
+                <span>
+                  ⏳ Đang xác minh
+                </span>
+
+                <b>
+                  ${fmt(pendingDeposit)} VND
+                </b>
+
+              </div>
+            `
+            : ''
+        }
+
+      </div>
+
+
+      <!-- WALLET -->
+      <div class="account-dropdown-section">
+
         <button
+          id="menuDeposit"
+          class="account-dropdown-row"
+          type="button"
+        >
+
+          <i class="account-dropdown-icon money">
+            $
+          </i>
+
+          <span>
+            Nạp tiền
+          </span>
+
+        </button>
+
+
+        <button
+          id="menuWithdraw"
+          class="account-dropdown-row"
+          type="button"
+        >
+
+          <i class="account-dropdown-icon withdraw">
+            ↥
+          </i>
+
+          <span>
+            Rút tiền
+          </span>
+
+        </button>
+
+      </div>
+
+
+      <!-- ACCOUNT -->
+      <div class="account-dropdown-section">
+
+        <button
+          class="account-dropdown-row"
           type="button"
           data-account-tab="profile"
         >
-          H\u1ed3 s\u01a1
+
+          <i class="account-dropdown-icon profile">
+            👤
+          </i>
+
+          <span>
+            Hồ sơ cá nhân
+          </span>
+
         </button>
 
+
         <button
+          class="account-dropdown-row"
           type="button"
           data-account-tab="history"
         >
-          L\u1ecbch s\u1eed \u0111\u1eb7t c\u01b0\u1ee3c
+
+          <i class="account-dropdown-icon history">
+            ◷
+          </i>
+
+          <span>
+            Lịch sử cược
+          </span>
+
         </button>
 
+
         <button
+          class="account-dropdown-row"
           type="button"
           data-account-tab="settings"
         >
-          C\u00e0i \u0111\u1eb7t
+
+          <i class="account-dropdown-icon settings">
+            ⚙
+          </i>
+
+          <span>
+            Cài đặt tài khoản
+          </span>
+
         </button>
+
 
         <button
           id="menuComplaint"
+          class="account-dropdown-row"
           type="button"
         >
-          Khi\u1ebfu n\u1ea1i
+
+          <i class="account-dropdown-icon support">
+            🎧
+          </i>
+
+          <span>
+            Hỗ trợ / Khiếu nại
+          </span>
+
         </button>
 
-        <div class="account-dropdown-wallet">
-          <button
-            id="menuDeposit"
-            type="button"
-          >
-            N\u1ea1p ti\u1ec1n
-          </button>
+      </div>
 
-          <button
-            id="menuWithdraw"
-            type="button"
-          >
-            R\u00fat ti\u1ec1n
-          </button>
-        </div>
+
+      <!-- LOGOUT -->
+      <div class="account-dropdown-section logout">
 
         <button
           id="desktopLogout"
-          class="account-logout"
+          class="account-dropdown-row account-logout"
           type="button"
         >
-          \u0110\u0103ng xu\u1ea5t
+
+          <i class="account-dropdown-icon logout">
+            ↪
+          </i>
+
+          <span>
+            Đăng xuất
+          </span>
+
         </button>
+
       </div>
 
-      <button
-        id="desktopDeposit"
-        class="header-wallet-btn deposit"
-        type="button"
-      >
-        N\u1ea1p
-      </button>
-
-      <button
-        id="desktopWithdraw"
-        class="header-wallet-btn withdraw"
-        type="button"
-      >
-        R\u00fat
-      </button>
-
-      <button
-        id="desktopGift"
-        class="wallet-gift-btn"
-        type="button"
-        aria-label="Qu\u00e0 n\u1ea1p"
-      >
-        \u{1f381}${eligible?'<i>1</i>':''}
-      </button>
 
     </div>
-  `;
+
+
+    <!-- NÚT HEADER CŨ GIỮ NGUYÊN -->
+    <button
+      id="desktopDeposit"
+      class="header-wallet-btn deposit"
+      type="button"
+    >
+      Nạp
+    </button>
+
+
+    <button
+      id="desktopWithdraw"
+      class="header-wallet-btn withdraw"
+      type="button"
+    >
+      Rút
+    </button>
+
+
+    <button
+      id="desktopGift"
+      class="wallet-gift-btn"
+      type="button"
+      aria-label="Quà nạp"
+    >
+      🎁${eligible?'<i>1</i>':''}
+    </button>
+
+  </div>
+`;
 
   el('drawerAuth').innerHTML=`
     <div class="drawer-signed-user">
