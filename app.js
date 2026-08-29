@@ -726,7 +726,6 @@ function doRegister(
   name,
   password,
   confirmPassword='',
-  fullname='',
   referralCode='',
   enteredCaptcha='',
   agreed=false
@@ -744,11 +743,6 @@ function doRegister(
 
   confirmPassword=
     String(confirmPassword||'');
-
-
-  fullname=
-    String(fullname||'')
-      .trim();
 
 
   referralCode=
@@ -817,20 +811,6 @@ function doRegister(
 
   }
 
-
-  /*
-   * FULL NAME
-   */
-  if(
-    fullname.length<2
-  ){
-
-    return toast(
-      'Vui lòng nhập họ và tên.',
-      true
-    );
-
-  }
 
 
   /*
@@ -916,9 +896,7 @@ function doRegister(
      * Họ tên được đưa thẳng
      * vào profile.
      */
-    profile:{
-      fullname
-    },
+    profile:{},
 
 
     walletTransactions:[],
@@ -4063,8 +4041,6 @@ el('doRegister').onclick=()=>{
 
     el('registerPassConfirm')?.value,
 
-    el('registerFullname')?.value,
-
     el('registerReferral')?.value,
 
     el('registerCaptchaInput')?.value,
@@ -4091,7 +4067,6 @@ el('resetRegister')
         'registerUser',
         'registerPass',
         'registerPassConfirm',
-        'registerFullname',
         'registerCaptchaInput'
       ]
         .forEach(
