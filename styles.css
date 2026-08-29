@@ -3799,7 +3799,7 @@ body.popup-open{
   .deposit-transfer-note{
     max-width:100%;
   }
-
+}
 .deposit-waiting-note{
   display:flex;
   align-items:flex-start;
