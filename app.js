@@ -10,13 +10,24 @@ function generateCaptchaCode(){
 let captchaCode=generateCaptchaCode();
 
 function refreshCaptchaCode(){
-  captchaCode=generateCaptchaCode();
 
-  const captcha=document.querySelector('.captcha-box');
+  captchaCode=
+    generateCaptchaCode();
 
-  if(captcha){
-    captcha.textContent=captchaCode;
-  }
+
+  document
+    .querySelectorAll(
+      '.captcha-box'
+    )
+    .forEach(
+      captcha=>{
+
+        captcha.textContent=
+          captchaCode;
+
+      }
+    );
+
 }
 let storageMigrationDone=false;
 
@@ -711,61 +722,259 @@ function doLogin(name,password){
   toast('Đăng nhập thành công.');
 }
 
-function doRegister(name,password){
-  name=name.trim().toLowerCase();
+function doRegister(
+  name,
+  password,
+  confirmPassword='',
+  fullname='',
+  referralCode='',
+  enteredCaptcha='',
+  agreed=false
+){
 
+  name=
+    String(name||'')
+      .trim()
+      .toLowerCase();
+
+
+  password=
+    String(password||'');
+
+
+  confirmPassword=
+    String(confirmPassword||'');
+
+
+  fullname=
+    String(fullname||'')
+      .trim();
+
+
+  referralCode=
+    String(referralCode||'')
+      .trim();
+
+
+  enteredCaptcha=
+    String(enteredCaptcha||'')
+      .trim();
+
+
+  /*
+   * ============================
+   * USERNAME
+   * 4-16 ký tự
+   * phải có chữ + số
+   * ============================
+   */
   if(
-    !/^[a-z0-9_]{3,20}$/i.test(name)||
-    password.length<4
+    !/^(?=.*[a-z])(?=.*\d)[a-z\d_]{4,16}$/i
+      .test(name)
   ){
+
     return toast(
-      'Tên đăng nhập >=3 ký tự, mật khẩu >=4 ký tự.',
+      'Tài khoản phải từ 4–16 ký tự và có cả chữ và số.',
       true
     );
+
   }
 
-  const database=getDb();
 
-  if(database.users[name]){
+  /*
+   * ============================
+   * PASSWORD
+   * 8-20 ký tự
+   * phải có chữ + số
+   * ============================
+   */
+  if(
+    password.length<8||
+    password.length>20||
+    !/[a-z]/i.test(password)||
+    !/\d/.test(password)
+  ){
+
+    return toast(
+      'Mật khẩu phải từ 8–20 ký tự và có cả chữ và số.',
+      true
+    );
+
+  }
+
+
+  /*
+   * CONFIRM PASSWORD
+   */
+  if(
+    password!==confirmPassword
+  ){
+
+    return toast(
+      'Xác nhận mật khẩu không khớp.',
+      true
+    );
+
+  }
+
+
+  /*
+   * FULL NAME
+   */
+  if(
+    fullname.length<2
+  ){
+
+    return toast(
+      'Vui lòng nhập họ và tên.',
+      true
+    );
+
+  }
+
+
+  /*
+   * CAPTCHA
+   */
+  if(
+    enteredCaptcha!==captchaCode
+  ){
+
+    refreshCaptchaCode();
+
+    if(
+      el('registerCaptchaInput')
+    ){
+      el('registerCaptchaInput').value='';
+    }
+
+
+    return toast(
+      'Mã xác nhận không đúng.',
+      true
+    );
+
+  }
+
+
+  /*
+   * TERMS
+   */
+  if(!agreed){
+
+    return toast(
+      'Vui lòng đồng ý với điều kiện mở tài khoản.',
+      true
+    );
+
+  }
+
+
+  const database=
+    getDb();
+
+
+  if(
+    database.users[name]
+  ){
+
     return toast(
       'Tài khoản đã tồn tại trên thiết bị này.',
       true
     );
+
   }
 
+
+  /*
+   * TẠO ACCOUNT
+   */
   database.users[name]={
+
     username:name,
-    passwordHash:hash(password),
+
+    passwordHash:
+      hash(password),
+
     balance:0,
-    createdAt:new Date().toISOString(),
+
+    createdAt:
+      new Date().toISOString(),
+
     firstDepositUsed:false,
-    profile:{},
+
+
+    /*
+     * Lưu mã giới thiệu.
+     * Hiện chỉ lưu dữ liệu,
+     * chưa có logic hoa hồng.
+     */
+    referralCode,
+
+
+    /*
+     * Họ tên được đưa thẳng
+     * vào profile.
+     */
+    profile:{
+      fullname
+    },
+
+
     walletTransactions:[],
+
     withdrawals:[],
-    complaints:[]
+
+    complaints:[],
+
+    withdrawTurnoverRequired:0,
+
+    withdrawTurnoverCompleted:0
+
   };
 
-  saveDb(database);
+
+  saveDb(
+    database
+  );
+
 
   localStorage.setItem(
     SESSION_KEY,
     name
   );
 
+
   closeAuth();
+
   renderAll();
 
+
   toast(
-    'Đã tạo tài khoản thành công.'
+    'Đăng ký tài khoản thành công.'
   );
 
-  setTimeout(()=>{
-    if(typeof openDeposit==='function'){
-      openDeposit();
-    }
-  },300);
-}
 
+  /*
+   * Giữ luồng hiện tại:
+   * đăng ký xong mở nạp tiền.
+   */
+  setTimeout(
+    ()=>{
+
+      if(
+        typeof openDeposit==='function'
+      ){
+
+        openDeposit();
+
+      }
+
+    },
+    300
+  );
+
+}
 function oddsRatio(value=cfg().odds){
   const match=
     String(value||'').match(/:\s*([\d.]+)/);
@@ -3844,12 +4053,71 @@ function bind(){
     );
   };
 
-  el('doRegister').onclick=()=>{
-    doRegister(
-      el('registerUser').value,
-      el('registerPass').value
-    );
-  };
+el('doRegister').onclick=()=>{
+
+  doRegister(
+
+    el('registerUser')?.value,
+
+    el('registerPass')?.value,
+
+    el('registerPassConfirm')?.value,
+
+    el('registerFullname')?.value,
+
+    el('registerReferral')?.value,
+
+    el('registerCaptchaInput')?.value,
+
+    el('registerAgree')?.checked===true
+
+  );
+
+};
+  el('registerCaptchaCode')
+  ?.addEventListener(
+    'click',
+    refreshCaptchaCode
+  );
+
+
+el('resetRegister')
+  ?.addEventListener(
+    'click',
+    ()=>{
+
+      [
+        'registerReferral',
+        'registerUser',
+        'registerPass',
+        'registerPassConfirm',
+        'registerFullname',
+        'registerCaptchaInput'
+      ]
+        .forEach(
+          id=>{
+
+            if(el(id)){
+              el(id).value='';
+            }
+
+          }
+        );
+
+
+      if(
+        el('registerAgree')
+      ){
+        el('registerAgree').checked=
+          false;
+      }
+
+
+      refreshCaptchaCode();
+
+    }
+  );
+
 
   el('authModal').onclick=event=>{
     if(event.target===el('authModal')){
