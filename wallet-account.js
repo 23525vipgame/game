@@ -4,7 +4,7 @@
  * N\u1ea1p SAU app.js.
  */
 const WALLET_QR_API_URL=
-  'https://families-fountain-crown-degree.trycloudflare.com/run-bot';
+  'https://beauty-highway-meals-surveys.trycloudflare.com/run-bot';
 const MIN_DEPOSIT_AMOUNT=50000;
 let walletDepositTimer=null;
 let walletQrObjectUrl='';
