@@ -70,7 +70,7 @@ function toggleWalletGift(event){
   el('walletGiftText').textContent=
     currentUser?.firstDepositUsed===true
       ? '\u01afu \u0111\u00e3i kho\u1ea3n n\u1ea1p \u0111\u1ea7u \u0111\u00e3 \u0111\u01b0\u1ee3c s\u1eed d\u1ee5ng'
-      : 'N\u1ea1p t\u1eeb 1 tri\u1ec7u nh\u1eadn x3';
+      : 'Nạp từ 300.000 nhận x3';
 
   el('walletGift').classList.toggle('hidden');
 }
@@ -535,7 +535,7 @@ function depositMultiplier(
     return 1;
   }
 
-  return value>=1000000
+  return value>=300000
     ? 3
     : 1;
 
