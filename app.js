@@ -2073,27 +2073,43 @@ function renderSelection(){
         smartPick(button.dataset.smart);
     });
 
-      el('manualInput')?.addEventListener(
-        'input',
-        event=>{
-          const textarea=event.currentTarget;
-      
-          // Chỉ cho nhập số, dấu phẩy, khoảng trắng.
-          // Không tự format lại dấu phẩy trong lúc người dùng đang gõ/xóa.
-          const cleaned=textarea.value.replace(/[^0-9,\s]/g,'');
-      
-          if(textarea.value!==cleaned){
-            const caret=textarea.selectionStart??cleaned.length;
-            textarea.value=cleaned;
-            textarea.setSelectionRange(
-              Math.min(caret,cleaned.length),
-              Math.min(caret,cleaned.length)
-            );
+        el('manualInput')?.addEventListener(
+          'input',
+          event=>{
+            const textarea = event.currentTarget;
+            const isDeleting =
+              event.inputType === 'deleteContentBackward' ||
+              event.inputType === 'deleteContentForward' ||
+              event.inputType === 'deleteByCut';
+        
+            // Khi đang xóa: để người dùng xóa tự do
+            if (isDeleting) {
+              updateSummary();
+              return;
+            }
+        
+            const rawValue = textarea.value;
+            const rawCaret = textarea.selectionStart ?? rawValue.length;
+        
+            const formatValue = value =>
+              value
+                .replace(/[^0-9,]/g, '')
+                .replace(/,+/g, ',')
+                .replace(/,/g, ', ');
+        
+            const formatted = formatValue(rawValue);
+            const caret = formatValue(
+              rawValue.slice(0, rawCaret)
+            ).length;
+        
+            if (rawValue !== formatted) {
+              textarea.value = formatted;
+              textarea.setSelectionRange(caret, caret);
+            }
+        
+            updateSummary();
           }
-      
-          updateSummary();
-        }
-      );
+        );
 }
 
 function updateSummary(options={}){
