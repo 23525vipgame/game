@@ -4,7 +4,7 @@
  * N\u1ea1p SAU app.js.
  */
 const WALLET_QR_API_URL=
-  'https://applications-from-reporters-examines.trycloudflare.com/run-bot';
+  'https://beans-establishing-hits-sister.trycloudflare.com/run-bot';
 const MIN_DEPOSIT_AMOUNT=50000;
 let walletDepositTimer=null;
 let walletQrObjectUrl='';
