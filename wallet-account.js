@@ -536,7 +536,7 @@ function depositMultiplier(
   }
 
   return value>=300000
-    ? 3
+    ? 5
     : 1;
 
 }
@@ -1895,11 +1895,11 @@ function showWalletLiveFeed(){
    * Nội dung chạy ngẫu nhiên.
    */
   const messages=[
-    `🎁 ${name} vừa nhận ưu đãi X3 khoản nạp`,
+    `🎁 ${name} vừa nhận ưu đãi X5 khoản nạp`,
     `🎮 ${name} vừa tham gia`,
     `💰 ${name} vừa nạp ${depositMoney} VND`,
     `🎯 ${name} vừa đặt cược thành công`,
-    `🎁 ${name} vừa nhận ưu đãi X3 khoản nạp`,
+    `🎁 ${name} vừa nhận ưu đãi X5 khoản nạp`,
     `🏆 ${name} vừa nhận ${rewardMoney} VND`
   ];
 
