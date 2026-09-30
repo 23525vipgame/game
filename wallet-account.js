@@ -2288,7 +2288,9 @@ bindX3Promo();
  */
 setTimeout(()=>{
 
-  openX3Promo();
+  if(user()){
+    openX3Promo();
+  }
 
 },1000);
 
