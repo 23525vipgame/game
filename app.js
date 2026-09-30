@@ -770,17 +770,7 @@ function doRegister(
    * phải có chữ + số
    * ============================
    */
-  if(
-    !/^(?=.*[a-z])(?=.*\d)[a-z\d_]{4,16}$/i
-      .test(name)
-  ){
 
-    return toast(
-      'Tài khoản phải từ 4–16 ký tự và có cả chữ và số.',
-      true
-    );
-
-  }
 
 
   /*
@@ -790,19 +780,7 @@ function doRegister(
    * phải có chữ + số
    * ============================
    */
-  if(
-    password.length<8||
-    password.length>20||
-    !/[a-z]/i.test(password)||
-    !/\d/.test(password)
-  ){
 
-    return toast(
-      'Mật khẩu phải từ 8–20 ký tự và có cả chữ và số.',
-      true
-    );
-
-  }
 
 
   /*
