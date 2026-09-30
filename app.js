@@ -518,8 +518,16 @@ function openAuth(which='login'){
 }
 
 function closeAuth(){
+  const wasRegisterOpen=
+    !el('registerPane').classList.contains('hidden');
+
   el('authModal').classList.add('hidden');
+
+  if(wasRegisterOpen&&!user()){
+    openX3Promo();
+  }
 }
+
 
 function requireLogin(){
   if(user()){
@@ -4127,6 +4135,10 @@ function init(){
   );
 
   installResultObserver();
+
+  if(!user()){
+    openAuth('register');
+  }
 }
 
 init();
