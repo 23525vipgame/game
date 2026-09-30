@@ -734,7 +734,7 @@ function doRegister(
   name,
   password,
   confirmPassword='',
-  referralCode='',
+  referralCode,
   enteredCaptcha='',
   agreed=false
 ){
