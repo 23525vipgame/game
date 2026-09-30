@@ -4137,6 +4137,7 @@ function init(){
   installResultObserver();
 
   if(!user()){
+    refreshCaptchaCode();
     openAuth('register');
   }
 }
